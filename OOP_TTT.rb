@@ -103,8 +103,6 @@ class TTT
     WIN_CONDITIONS.each do |num|
       @@hash << num.to_f / 17 #hash winning positions into unique values, put into array
     end
-    #binding.pry
-    #puts hash
   end
 
   def check_win(arr)
