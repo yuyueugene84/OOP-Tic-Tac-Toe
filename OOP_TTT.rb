@@ -7,13 +7,13 @@ require 'pry'
 
 module HelpMethods
 
-  def check_full(arr)
+  def check_full_grid(arr)
     if !arr.include?(" ")
       return false
     end
   end
 
-  def check_filled(board, position)
+  def check_position_filled(board, position)
     if board[position.to_i - 1] != " "
       true
     else
@@ -61,7 +61,7 @@ class Human < Player
       user_position = gets.chomp.to_i
     end while !(1..9).to_a.include?(user_position)
     #self.choice = user_position
-    if check_filled(board, user_position) == true
+    if check_position_filled(board, user_position) == true
       puts "Grid already filled!"
       pick_grid(board)
     else
@@ -76,7 +76,7 @@ class Computer < Player
 
   def pick_grid(board)
     computer_position = rand(1..9)
-    if check_filled(board, computer_position) == true
+    if check_position_filled(board, computer_position) == true
       pick_grid(board)
     else
       board[computer_position - 1] = "O" #user input will print X in grid
@@ -171,7 +171,7 @@ class TTT
       print_grid(@board)
       @board =@computer.pick_grid(@board)
       print_grid(@board)
-      if check_win(@board) == nil && (check_full(@board) == false)
+      if check_win(@board) == nil && (check_full_grid(@board) == false)
         puts "It's a tie!"
         break
       elsif check_win(@board) == 1
@@ -181,7 +181,7 @@ class TTT
         puts "you lose..."
         break
       end
-    end until (check_full(@board) == false) || (check_win(@board) != nil)
+    end until (check_full_grid(@board) == false) || (check_win(@board) != nil)
     replay
   end #end play
 
