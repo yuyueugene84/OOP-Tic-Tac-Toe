@@ -5,7 +5,6 @@
 
 require 'pry'
 
-
 module HelpMethods
 
   def check_full(arr)
@@ -134,15 +133,13 @@ class TTT
 
     player_processed.each do |value|  #check if any hashed combination value is equal to the hashed value in @@hash
       if @@hash.include?(value.to_f / 17)
-        #puts "YOU WIN!"
-        return 1
+        return 1 #player wins
       end
     end
 
     computer_processed.each do |value|
       if @@hash.include?(value.to_f / 17)
-        #puts "you lose..."
-        return 2
+        return 2 #computer wins
       end
     end
 
@@ -174,7 +171,10 @@ class TTT
       print_grid(@board)
       @board =@computer.pick_grid(@board)
       print_grid(@board)
-      if check_win(@board) == 1
+      if check_win(@board) == nil && (check_full(@board) == false)
+        puts "It's a tie!"
+        break
+      elsif check_win(@board) == 1
         puts "YOU WIN!"
         break
       elsif check_win(@board) == 2
@@ -187,4 +187,5 @@ class TTT
 
 end #end class TTT
 
+#-----------Main program starts here--------------
 game = TTT.new.play
