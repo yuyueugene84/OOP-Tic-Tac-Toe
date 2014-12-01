@@ -55,20 +55,32 @@ end
 class Human < Player
   include HelpMethods
 
+  @pick = true
   def pick_grid(board)
+
     begin
-      puts "Please choose a position, from 1 - 9:"
-      user_position = gets.chomp.to_i
-    end while !(1..9).to_a.include?(user_position)
-    #self.choice = user_position
-    if check_position_filled(board, user_position) == true
-      puts "Grid already filled!"
-      pick_grid(board)
-    else
+      begin
+        puts "Please choose a position, from 1 - 9:"
+        user_position = gets.chomp.to_i
+      end while !(1..9).to_a.include?(user_position)
+      #self.choice = user_position
+      if check_position_filled(board, user_position) == true
+        puts "Grid already filled!"
+        @pick == false
+        #pick_grid(board)
+      else
       board[user_position - 1] = "X" #user input will print X in grid
-    end
+      end
+
+    end while @pick == true #end while
+
+
     board
   end #end pick_grid
+
+
+
+
 end
 
 class Computer < Player
@@ -88,7 +100,7 @@ end
 class TTT
 
   include HelpMethods
-  attr_accessor :player_choice, :computer_choice
+  attr_accessor :player_choice, :computer_choice, :board, :human, :computer
   WIN_CONDITIONS = [ 210, 543, 876, 630, 741, 853, 840, 642 ] #joined index for hashing, in reversed order to avoid invalid octal digit
   @@hash = [] #used to store hashed values of the WIN_CONDITIONS
   @board = []
@@ -167,21 +179,21 @@ class TTT
   def play
     intro
     begin
-      @board = @human.pick_grid(@board)
-      print_grid(@board)
-      @board =@computer.pick_grid(@board)
-      print_grid(@board)
-      if check_win(@board) == nil && (check_full_grid(@board) == false)
+      @board = human.pick_grid(board)
+      print_grid(board)
+      @board = computer.pick_grid(board)
+      print_grid(board)
+      if check_win(board) == nil && (check_full_grid(board) == false)
         puts "It's a tie!"
         break
-      elsif check_win(@board) == 1
+      elsif check_win(board) == 1
         puts "YOU WIN!"
         break
-      elsif check_win(@board) == 2
+      elsif check_win(board) == 2
         puts "you lose..."
         break
       end
-    end until (check_full_grid(@board) == false) || (check_win(@board) != nil)
+    end until (check_full_grid(board) == false) || (check_win(board) != nil)
     replay
   end #end play
 
