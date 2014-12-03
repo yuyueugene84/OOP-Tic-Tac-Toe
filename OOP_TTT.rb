@@ -8,8 +8,8 @@ require 'pry'
 module HelpMethods
 
   def check_full_grid(arr)
-    if !arr.include?(" ")
-      return false
+    if !arr.include?(" ") #if there is no empty space, return true
+      return true
     end
   end
 
@@ -55,43 +55,31 @@ end
 class Human < Player
   include HelpMethods
 
-  @pick = true
   def pick_grid(board)
-
-    begin
-      begin
-        puts "Please choose a position, from 1 - 9:"
-        user_position = gets.chomp.to_i
-      end while !(1..9).to_a.include?(user_position)
-      #self.choice = user_position
-      if check_position_filled(board, user_position) == true
-        puts "Grid already filled!"
-        @pick == false
-        #pick_grid(board)
+    while true
+      puts "Please choose a position, from 1 - 9:"
+      user_position = gets.chomp.to_i
+      if (1..9).to_a.include?(user_position) && (check_position_filled(board, user_position) == false)
+        board[user_position - 1] = "X" #user input will print X in grid
+        break
       else
-      board[user_position - 1] = "X" #user input will print X in grid
+        puts "Error: you must enter a position (from 1 to 9) of an empty grid."
       end
-
-    end while @pick == true #end while
-
-
+    end
     board
   end #end pick_grid
-
-
-
-
 end
 
 class Computer < Player
   include HelpMethods
 
   def pick_grid(board)
-    computer_position = rand(1..9)
-    if check_position_filled(board, computer_position) == true
-      pick_grid(board)
-    else
-      board[computer_position - 1] = "O" #user input will print X in grid
+    while true
+      computer_position = rand(1..9)
+      if (1..9).to_a.include?(computer_position) && check_position_filled(board, computer_position) == false
+        board[computer_position - 1] = "O" #user input will print X in grid
+        break
+      end #end if
     end
     board
   end #end pick_grid
@@ -100,7 +88,7 @@ end
 class TTT
 
   include HelpMethods
-  attr_accessor :player_choice, :computer_choice, :board, :human, :computer
+  attr_accessor :player_choice, :computer_choice, :board, :human, :computer, :playing
   WIN_CONDITIONS = [ 210, 543, 876, 630, 741, 853, 840, 642 ] #joined index for hashing, in reversed order to avoid invalid octal digit
   @@hash = [] #used to store hashed values of the WIN_CONDITIONS
   @board = []
@@ -110,6 +98,7 @@ class TTT
     @computer = Computer.new("Matrix")
     @board = initialize_array
     print_grid(@board)
+    playing == true
 
     WIN_CONDITIONS.each do |num|
       @@hash << num.to_f / 17 #hash winning positions into unique values, put into array
@@ -171,7 +160,9 @@ class TTT
       TTT.new.play
     elsif user_input == 'n'
       puts "Thank you for playing!"
+      puts "=========================================================="
       puts "This game is created by Eugene Chang a.k.a ToxicStar, 2014"
+      puts "=========================================================="
       exit
     end #end if
   end #end replay
@@ -181,19 +172,30 @@ class TTT
     begin
       @board = human.pick_grid(board)
       print_grid(board)
-      @board = computer.pick_grid(board)
-      print_grid(board)
-      if check_win(board) == nil && (check_full_grid(board) == false)
+      if check_full_grid(board) == true && check_win(board) == nil #check if it's a tie
         puts "It's a tie!"
-        break
-      elsif check_win(board) == 1
+        playing = false
+      elsif check_full_grid(board) == true && check_win(board) == 1
         puts "YOU WIN!"
-        break
-      elsif check_win(board) == 2
+        playing = false
+      elsif check_full_grid(board) == true && check_win(board) == 2
         puts "you lose..."
-        break
+        playing = false
+      else
+        @board = computer.pick_grid(board) #if it's not a tie and the board is not full, then computer can make a move
       end
-    end until (check_full_grid(board) == false) || (check_win(board) != nil)
+
+      print_grid(board)
+
+      if check_win(board) == 1
+        puts "YOU WIN!"
+        playing = false
+      end
+      if check_win(board) == 2
+        playing = false
+        puts "you lose..."
+      end
+    end until playing == false
     replay
   end #end play
 
